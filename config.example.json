@@ -1,0 +1,14 @@
+{
+  "ip": "",
+  "subnet": "255.255.255.0",
+  "gateway": "",
+  "dns": "",
+  "alt_dns": "",
+  "skip_ip": false,
+  "rj_accounts": {},
+  "last_rj_user": "",
+  "auto_rj": true,
+  "close_mode": "最小化到托盘",
+  "auto_boot": false,
+  "auto_auth": false
+}

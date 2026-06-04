@@ -1,4 +1,4 @@
-import sys
+﻿import sys
 import os
 import ctypes
 import subprocess
@@ -18,7 +18,7 @@ from tkinter import ttk
 from PIL import Image, ImageDraw
 
 CREATE_NO_WINDOW = 0x08000000
-CURRENT_VERSION = "0.1.1"
+CURRENT_VERSION = "0.1.2"
 
 def is_admin():
     try:
@@ -218,7 +218,7 @@ class App(tk.Tk):
     def __init__(self, silent_mode=False):
         super().__init__()
         self.silent_mode = silent_mode
-        self.title("大连交通大学有线网认证 v0.1.1")
+        self.title(f"大连交通大学有线网认证 v{CURRENT_VERSION}")
         self.geometry("450x780")
         self.configure(bg="#f8f9fa")
         
@@ -389,6 +389,13 @@ class App(tk.Tk):
             base_path = os.path.dirname(os.path.abspath(__file__))
         return os.path.join(base_path, relative_path)
 
+    def center_dialog(self, dialog, width, height):
+        self.update_idletasks()
+        dialog.update_idletasks()
+        x = self.winfo_x() + (self.winfo_width() - width) // 2
+        y = self.winfo_y() + (self.winfo_height() - height) // 2
+        dialog.geometry(f"{width}x{height}+{max(x, 0)}+{max(y, 0)}")
+
     def get_tray_image(self):
         png_path = self.get_resource_path("icon.png")
         ico_path = self.get_resource_path("icon.ico")
@@ -547,10 +554,10 @@ class App(tk.Tk):
     def open_settings(self):
         dlg = tk.Toplevel(self)
         dlg.title("设置")
-        dlg.geometry("380x390")
         dlg.configure(bg="#f8f9fa")
         dlg.transient(self)
         dlg.grab_set()
+        self.center_dialog(dlg, 380, 390)
         
         tk.Label(dlg, text="常规设置", font=("Microsoft YaHei", 11, "bold"), bg="#f8f9fa").pack(pady=10)
         
@@ -585,10 +592,10 @@ class App(tk.Tk):
     def show_feedback_dialog(self):
         fb_win = tk.Toplevel(self)
         fb_win.title("反馈问题")
-        fb_win.geometry("280x320")
         fb_win.configure(bg="#f8f9fa")
         fb_win.transient(self)
         fb_win.grab_set()
+        self.center_dialog(fb_win, 280, 320)
         
         tk.Label(fb_win, text="请选择反馈方式", font=("Microsoft YaHei", 11, "bold"), bg="#f8f9fa").pack(pady=(15, 10))
         
@@ -604,14 +611,15 @@ class App(tk.Tk):
         task_name = "DJTUNetworkConfigurator"
         if self.setting_auto_boot.get():
             if getattr(sys, 'frozen', False):
-                exe_path = sys.executable
+                task_run = f'"{sys.executable}" --silent'
             else:
-                exe_path = sys.executable + '\" \"' + os.path.abspath(__file__)
-            cmd = f'schtasks /create /tn "{task_name}" /tr "\\"{exe_path}\\" --silent" /sc onlogon /rl highest /f'
-            subprocess.run(cmd, shell=True, creationflags=CREATE_NO_WINDOW)
+                task_run = f'"{sys.executable}" "{os.path.abspath(__file__)}" --silent'
+            subprocess.run([
+                "schtasks", "/create", "/tn", task_name, "/tr", task_run,
+                "/sc", "onlogon", "/rl", "highest", "/f"
+            ], creationflags=CREATE_NO_WINDOW)
         else:
-            cmd = f'schtasks /delete /tn "{task_name}" /f'
-            subprocess.run(cmd, shell=True, creationflags=CREATE_NO_WINDOW)
+            subprocess.run(["schtasks", "/delete", "/tn", task_name, "/f"], creationflags=CREATE_NO_WINDOW)
 
     def reset_network(self):
         if not self.interface_name:
@@ -696,9 +704,9 @@ class App(tk.Tk):
     def download_and_install(self, url):
         dl_win = tk.Toplevel(self)
         dl_win.title("正在下载更新")
-        dl_win.geometry("350x120")
         dl_win.transient(self)
         dl_win.grab_set()
+        self.center_dialog(dl_win, 350, 120)
         
         lbl_status = tk.Label(dl_win, text="正在准备下载...", font=("Microsoft YaHei", 9))
         lbl_status.pack(pady=(15, 5))
@@ -1027,3 +1035,4 @@ if __name__ == "__main__":
     
     app = App(silent_mode=silent_mode)
     app.mainloop()
+

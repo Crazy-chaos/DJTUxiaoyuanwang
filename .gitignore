@@ -1,0 +1,21 @@
+__pycache__/
+*.py[cod]
+*.log
+
+build/
+dist/
+.venv/
+.pydeps/
+.tools/
+
+config.json
+ip_data.dat
+ip_results.txt
+Ruijie Supplicant/
+rjrzkhd4.99.exe
+vcredist_x86.exe
+icon_square.png
+
+*.exe
+*.msi
+*.zip
